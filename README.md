@@ -1,75 +1,67 @@
 Clothes-Shop — Shop Network System
 
-A multi-tier client–server application that simulates a clothing shop network with multiple branches. Employees can manage inventory and customers, process sales (including a cart/one-payment checkout), and talk with other branches using a real-time chat server. Everything is persisted to simple CSV-like text files and fully logged.
+Multi-tier client–server app for managing a clothing shop network with multiple branches. Employees handle inventory & customers, process sales (including a cart/one-payment checkout), and chat with other branches in real time. Data is stored in simple CSV-like files and fully logged.
 
-✨ Highlights
+✨ Features
 
-Branch-scoped inventory (per branch) + live updates for all employees at that branch
+Branch-scoped inventory with live updates per branch
 
-Customers with types: NEW, RETURNING, VIP
+Customers (NEW, RETURNING, VIP)
 
-Discounts implemented by strategy classes
+Strategy-based discounts
 
-VIP: 12% discount; gift shirt when final cart total ≥ 300 (type logic)
+VIP: 12% off cart; gift shirt when final total ≥ 300
 
 Sales
 
-Single-item sale (legacy)
+Single item sale (legacy)
 
-Multi-item cart (SELL_MULTI) – one payment, line-level breakdown
+Multi-item cart (SELL_MULTI) – one payment, per-line breakdown
 
 Employees & Admin
 
-Admin creates employees, sets password policy (min length, special char required, letter required)
+Add/delete employees, list, set password policy (min length, special char required, letter required)
 
-Duplicate login prevention
-
-SHA-256 password hashing
-
-Simple account metadata (account number, phone, full name, national ID, role, branch)
+Duplicate login prevention, SHA-256 password hashing
 
 Chat server
 
-Branch-to-branch requests
+Inter-branch requests; first accept wins
 
-First accept wins; others get “taken”
-
-Shift Manager can list and join live conversations
+Shift Manager can list and join active conversations
 
 Comprehensive logging
 
-Auth, employees, customers, transactions, chat (CSV), system
+system, auth, employees, customers, transactions, chat (CSV)
 
-Admin Logs & Reports menu to tail the latest lines
+File-based storage (CSV) + auto-create starter files
 
-File-based storage (human-readable CSV) with starter files auto-created on first compile
+Multithreaded servers (thread-per-client)
 
-Multithreaded servers (thread per client)
-
-🗂️ Project Layout
+🗂️ Directory Structure
 Clothes-Shop/
-├─ src/                       # All source code (client & server)
-│  ├─ client/app/            # ClientConsole and menus
-│  ├─ server/app/            # StoreServer main & ChatServer main
-│  ├─ server/net/            # ClientHandler (store protocol)
-│  ├─ server/domain/         # Domain services & models
-│  │  ├─ customers/          # Customer, CustomerType, New/Returning/Vip
-│  │  ├─ employees/          # Employee, EmployeeDirectory, PasswordPolicy, AuthService
-│  │  ├─ invantory/          # Product, InventoryService   (typo kept to match package)
-│  │  └─ sales/              # SalesService (single + multi)
-│  ├─ server/shared/         # Branch enum
-│  └─ server/util/           # FileDatabase, Loggers, ChatLogger
-├─ data/                      # CSV-like data files (auto-created on first compile if missing)
-├─ logs/                      # Log files (rotated simply by appending)
-├─ out/                       # Compiled .class files
-├─ compile.bat                # Compile all sources (Windows)
-├─ run-server.bat             # Start StoreServer (port 5050)
-├─ run-chat.bat               # Start ChatServer  (port 6060)
-├─ run-client.bat             # Start ClientConsole
-└─ README.md                  # This file
+├─ src/
+│  ├─ client/app/              # ClientConsole and menus
+│  ├─ server/app/              # StoreServer main & ChatServer main
+│  ├─ server/net/              # ClientHandler (store protocol)
+│  ├─ server/domain/
+│  │  ├─ customers/            # Customer, CustomerType, New/Returning/Vip
+│  │  ├─ employees/            # Employee, EmployeeDirectory, PasswordPolicy, AuthService
+│  │  ├─ invantory/            # Product, InventoryService   (name kept to match code)
+│  │  └─ sales/                # SalesService (single + multi)
+│  ├─ server/shared/           # Branch enum
+│  └─ server/util/             # FileDatabase, Loggers, ChatLogger
+├─ data/                       # CSV-like data files (auto-created if missing)
+├─ logs/                       # Log files
+├─ out/                        # Compiled .class files
+├─ compile.bat                 # Compile all sources (Windows)
+├─ run-server.bat              # Start StoreServer (5050)
+├─ run-chat.bat                # Start ChatServer  (6060)
+├─ run-client.bat              # Start ClientConsole
+└─ README.md
 
 
-Ports: StoreServer 5050, ChatServer 6060, Host 127.0.0.1
+Default host: 127.0.0.1. Ports: StoreServer 5050, ChatServer 6060.
 
 🚀 Quick Start (Windows)
 
@@ -78,7 +70,7 @@ Compile
 compile.bat
 
 
-This scans src\**\*.java, compiles to out\, and ensures data\employees.txt & logs\ exist.
+Scans src\**\*.java, compiles to out\, ensures data\ + logs\ exist, creates empty data\employees.txt on first run.
 
 Run servers
 
@@ -86,7 +78,7 @@ run-server.bat
 run-chat.bat
 
 
-Run client(s)
+Run a client
 
 run-client.bat
 
@@ -95,53 +87,60 @@ Login
 
 Admin: username=admin, password=admin
 
-Employees: create via Admin menu
+Employees: create via Admin menu.
 
-IntelliJ: Open project, set project SDK (Java 8+), mark src as Sources Root, run mains in server.app.StoreServer, server.app.ChatServer, and client.app.ClientConsole.
+IntelliJ: Open project → set Project SDK (Java 8+) → mark src as Sources Root → run mains:
+
+server.app.StoreServer
+
+server.app.ChatServer
+
+client.app.ClientConsole
 
 🔐 Password Policy
 
-Configurable by Admin → Set password policy:
+Configured via Admin → Set password policy:
 
-Minimum length: default 6 (editable)
+Minimum length (default 6)
 
-Require special char: at least one non-alphanumeric (e.g., !@#$%…)
+Require special char (any non-alphanumeric, e.g. !@#$%)
 
-Require letter: at least one [A–Z or a–z]
+Require letter (A–Z/a–z)
 
-The policy applies when creating employees. Passwords are stored as SHA-256 hashes.
+Passwords are hashed with SHA-256 (stored only as hash).
 
-👥 Employees & Roles
+👥 Employees
 
-SALESPERSON, CASHIER, SHIFT_MANAGER (for chat moderation/join)
+Roles: SALESPERSON, CASHIER, SHIFT_MANAGER
 
-Record format (data/employees.txt):
+Record format — data/employees.txt:
 
 employeeId,username,hash,role,branch,accountNumber,phone,fullName,nationalId
-
-
-Created/managed via Admin menu.
 
 👤 Customers
 
 Types: NEW, RETURNING, VIP (strategy classes)
 
-VIP: 12% discount + qualifiesGiftShirt(finalTotal) → gift if finalTotal ≥ 300
+VIP rules live in VipCustomer:
 
-Record format (data/customers.txt):
+applyDiscount: 12%
+
+qualifiesGiftShirt(finalTotal): gift when final ≥ 300
+
+Record format — data/customers.txt:
 
 id,fullName,phone,type
 
 📦 Inventory
 
-Per-branch quantities and prices
+Per-branch quantities & prices
 
-Record format (data/products.txt):
+Record format — data/products.txt:
 
 sku,category,branch,quantity,price
 
-🛒 Sales
-Single-item (legacy)
+🛒 Sales Protocol
+Single item (legacy)
 SELL <branch> <sku> <qty> <customerId>
 → OK SALE <base> <discount> <final> <customerType>
 
@@ -153,29 +152,22 @@ SELL_MULTI <branch> <customerId> <sku1>:<qty1>,<sku2>:<qty2>,...
    OK END
 
 
-All-or-nothing stock check
+All-or-nothing stock check.
 
-Discount strategy from customer type
+Discounts via customer type.
 
-Gift shirt only if type says so (VIP ≥ 300 after discount)
+Gift shirt emitted only when type qualifies (VIP ≥ 300 after discount).
 
-Example
-
-SELL_MULTI HOLON 123456789  A1:2,B7:1
-
-💬 Chat Server (inter-branch)
-
-Protocol
-
+💬 Chat Protocol (inter-branch)
 HELLO <username> <role:SALESPERSON|CASHIER|SHIFT_MANAGER> <branch:HOLON|TEL_AVIV|RISHON>
-REQUEST_BRANCH <branch>          # broadcast request to that branch
+REQUEST_BRANCH <branch>
 REQUEST_ANY_OTHER_BRANCH
 REQUEST_USER <username>
-ACCEPT <requestId>               # first accept wins
-LIST_CONVS                       # (Manager) list active convs
-JOIN <conversationId>            # (Manager) join
+ACCEPT <requestId>
+LIST_CONVS                      # Shift Manager
+JOIN <conversationId>           # Shift Manager
 MSG <text...>
-END                              # leave conversation
+END
 QUIT
 
 
@@ -183,76 +175,61 @@ Events
 
 INCOMING_REQUEST <id> <fromUser> <fromBranch>
 PAIRED <convId> <user1,user2[,manager]>
-REQUEST_TAKEN <id>
-REQUEST_CANCELLED <id>
+REQUEST_TAKEN <id> | REQUEST_CANCELLED <id>
 MANAGER_JOINED <username>
 INFO LEFT_CONVERSATION | CONVERSATION_ENDED
 
 
-Client prints pretty chat lines (e.g., 💬 noa: hi).
+Client displays pretty chat lines (e.g., 💬 noa: hi).
 
 🧾 Logs
 
-Stored under logs\:
+Saved under logs\:
 
-system.log — server/runtime events
+system.log — server/runtime
 
-auth.log — logins/logouts, duplicate login prevented
+auth.log — logins/logouts, duplicate-login prevention
 
 employees.log — add/delete employees
 
-customers.log — add customers
+customers.log — added customers
 
 transactions.log — sales (single & multi)
 
-chat_messages.csv — conversation id, user, message text, timestamps
+chat_messages.csv — conversation id, user, message, timestamps
 
-Admin → Logs & Reports lets you view the last N lines of each log directly from the client.
+Admin → Logs & Reports shows the last N lines of each log.
 
-🔧 Troubleshooting
+🛠️ Troubleshooting
 
-Compilation succeeded but no files
-compile.bat creates out\ classes and ensures data\ + empty employees.txt. Run from project root.
+Compilation ok but nothing runs → run from project root; compile.bat writes to out\ and creates data\/logs\.
 
-“ERR LOGIN ALREADY_CONNECTED”
-The same username is already connected. Logout on the other client or wait for timeout.
+“ERR LOGIN ALREADY_CONNECTED” → same username already connected; logout the other session.
 
-Password rejected
-Check Admin → Password policy. Special char means any non-alphanumeric (e.g., !@#$%).
+Password rejected → check policy (needs special char & letter per settings).
 
-Missing product/customer
-Ensure the IDs exist in data\*.txt or add via menus.
+SKU / customer not found → add via menus or edit files in data\.
 
-🏗️ Architecture Notes
+📐 Architecture
 
-Server-side:
+StoreServer (5050): ClientHandler per connection
 
-StoreServer (5050) + ClientHandler (thread per connection)
+ChatServer (6060): sessions, broadcast requests, accept-race, manager join
 
-ChatServer (6060) manages sessions, broadcast requests, accept-race, manager join
+Domain services: InventoryService, SalesService, CustomerService, EmployeeDirectory
 
-Domain services: single responsibility (inventory, sales, customers, employees)
+CustomerType strategies encapsulate discounts & gifts
 
-CustomerType strategies encapsulate discount & gift rules
+Persistence: FileDatabase (CSV read/write)
 
-Persistence: FileDatabase does simple CSV read/write, synchronized where needed
+Logging: server.util.Loggers + ChatLogger
 
-Logging: java.util.logging wrappers in server.util.Loggers and ChatLogger
+✅ Requirements
 
-📋 Requirements
+Java 8+
 
-Java 8 or higher (tested with modern javac)
+Windows (batch scripts) — or run from IDE
 
-Windows (batch scripts). For Unix/macOS you can run mains directly from IDE or craft equivalent shell scripts.
-
-🙌 Authors
+👩‍💻 Authors
 
 Dana Oshri · Lihi Kimhazi · Noa Gerbi · Ron Gershtein
-
-📣 Notes
-
-The package invantory keeps the original name to match existing sources.
-
-Data files are intentionally simple to keep the project portable and reviewable.
-
-Feel free to extend: promotions, receipts to file/PDF, manager dashboards, or database backend.
